@@ -15,7 +15,10 @@ class Maze:
 
     def __getitem__(self, move):
         if isinstance(move, tuple) and len(move) == 2:
-            return move[0] in self.__grid[move[1]]
+            if move[1] < 0 or move[1] >= self.__N:
+                return False
+            else:
+                return move[0] in self.__grid[move[1]]
 
         return None
 
@@ -28,3 +31,7 @@ class Maze:
     @property
     def grid(self):
         return self.__grid
+    
+    @property
+    def shape(self):
+        return self.__maze_shape

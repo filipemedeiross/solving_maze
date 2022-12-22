@@ -1,6 +1,7 @@
 import pygame
 from webbrowser import open
 from .maze import Maze
+from .fiancee import Fiancee
 from .constants import *
 
 
@@ -8,6 +9,7 @@ class FianceEscape:
     def __init__(self, N=N):
         # Initializing game logic
         self.maze = Maze()
+        self.fiancee = Fiancee((grid_left + block_size, grid_top + block_size))
 
         pygame.init()  # initializing pygame
 
@@ -44,6 +46,15 @@ class FianceEscape:
         self.button_info_rect = self.button_info.get_rect(bottomright=(width - grid_left,
                                                                        grid_top - 0.5 * spacing_buttons))
 
+        self.button_return = pygame.transform.scale(pygame.image.load('fiance_escape/media/main.png'), button_size)
+        self.button_return_rect = self.button_return.get_rect(bottomleft=(grid_left,
+                                                                          grid_top - 0.5*spacing_buttons))
+
+        self.button_win = pygame.transform.scale(pygame.image.load('fiance_escape/media/win.png'),
+                                                (maze_area, maze_area))
+        self.button_win.set_alpha(180)
+        self.button_win_rect = self.button_win.get_rect(topleft=self.rects[0].topleft)
+
     def init_game(self):  # method that start the game
         # Creating a display Surface
         self.screen = pygame.display.set_mode(size)
@@ -54,6 +65,7 @@ class FianceEscape:
 
         while True:
             self.main_screen()
+            self.play()
 
     def main_screen(self):
         # Preparing the main screen
@@ -75,6 +87,72 @@ class FianceEscape:
                         return
                     if self.button_info_rect.collidepoint(event.pos):
                         open('https://github.com/filipemedeiross/', new=2)
+
+    def play(self):
+        # Reset variables
+        self.fiancee.init_pos((grid_left + block_size, grid_top + block_size))
+
+        time = 0
+        move = None
+
+        self.clock.tick()  # update the clock
+
+        # Displaying fixed screen elements
+        self.screen.blit(self.bg, (0, 0))  # overriding home screen buttons
+
+        self.screen.blit(self.button_return, self.button_return_rect)
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit(0)
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.button_return_rect.collidepoint(event.pos):
+                        self.update()  # update the grid
+                        return
+
+                if not self.maze.won(*self.fiancee.xy):
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        #if self.button_solve_rect.collidepoint(event.pos):
+                        #    self.__show_solution = not self.__show_solution
+                        pass
+
+                    elif event.type == pygame.KEYDOWN:
+                        pos = self.fiancee.x + self.fiancee.y*shape
+                        place = self.grid_to_place(self.fiancee.x, self.fiancee.y)
+
+                        if event.key == pygame.K_UP and self.maze[pos, pos - shape]:
+                            move = 'u'
+                            rect = self.rects[place - 2*n_elem].topleft
+                        elif event.key == pygame.K_DOWN and self.maze[pos, pos + shape]:
+                            move = 'd'
+                            rect = self.rects[place + 2*n_elem].topleft
+                        elif event.key == pygame.K_RIGHT and self.maze[pos, pos + 1]:
+                            move = 'r'
+                            rect = self.rects[place + 2].topleft
+                        elif event.key == pygame.K_LEFT and self.maze[pos, pos - 1]:
+                            move = 'l'
+                            rect = self.rects[place - 2].topleft
+
+                        if move:
+                            self.fiancee.move(move, rect)
+                            move = None
+
+                            if self.maze.won(*self.fiancee.xy):
+                                self.display_grid()
+                                self.screen.blit(self.fiancee.image, self.fiancee.rect)
+
+                                self.screen.blit(self.button_win, self.button_win_rect)
+
+            if not self.maze.won(*self.fiancee.xy):
+                self.display_grid()
+                self.screen.blit(self.fiancee.image, self.fiancee.rect)
+
+                # Game time
+                time += self.clock.tick(10)
+
+            pygame.display.flip()
 
     def display_grid(self):
         # Clearing the area of the maze
@@ -108,28 +186,30 @@ class FianceEscape:
                 else:
                     self.screen.blit(self.wall, self.rects[i_pos + j_pos*n_elem + 1])
             
-            self.screen.blit(self.path, self.rects[i_pos + 2 + j_pos*n_elem])
+            self.screen.blit(self.path, self.rects[i_pos + j_pos*n_elem + 2])
 
         # Vertical paths
         for j in range(shape-1):
-            for i in range(shape-1):
+            for i in range(shape):
                 i_pos, j_pos = self.grid_to_rect(i, j)
 
-                if (self.maze[i + j*shape, i + j*shape + shape]):
-                    self.screen.blit(self.path, self.rects[i_pos + j_pos*n_elem + n_elem])
+                if (self.maze[i + j*shape, i + (j + 1)*shape]):
+                    self.screen.blit(self.path, self.rects[i_pos + (j_pos + 1)*n_elem])
                 else:
-                    self.screen.blit(self.wall, self.rects[i_pos + j_pos*n_elem + n_elem])
+                    self.screen.blit(self.wall, self.rects[i_pos + (j_pos + 1)*n_elem])
 
-                self.screen.blit(self.wall, self.rects[i_pos + 1 + j_pos*n_elem + n_elem])
+                if (i != shape-1):
+                    self.screen.blit(self.wall, self.rects[i_pos + (j_pos + 1)*n_elem + 1])
+
+    def update(self):
+        self.maze.update_maze()  # update the grid
             
-            i_pos, j_pos = self.grid_to_rect(shape-1, j)
-
-            if (self.maze[i + j*shape, i + j*shape + shape]):
-                self.screen.blit(self.path, self.rects[i_pos + j_pos*n_elem + n_elem])
-            else:
-                self.screen.blit(self.wall, self.rects[i_pos + j_pos*n_elem + n_elem])
-
     @staticmethod
     # Transforms the identification in the graph to the grid of rects
     def grid_to_rect(i, j):
         return (1 + 2*i, 1 + 2*j)
+
+    def grid_to_place(self, i, j):
+        i_pos, j_pos = self.grid_to_rect(i, j)
+
+        return i_pos + j_pos * n_elem
