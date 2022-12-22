@@ -123,27 +123,79 @@ class FianceEscape:
                         place = self.grid_to_place(self.fiancee.x, self.fiancee.y)
 
                         if event.key == pygame.K_UP and self.maze[pos, pos - shape]:
-                            move = 'u'
+                            self.fiancee.move('u')
+
                             rect = self.rects[place - 2*n_elem].topleft
-                        elif event.key == pygame.K_DOWN and self.maze[pos, pos + shape]:
-                            move = 'd'
-                            rect = self.rects[place + 2*n_elem].topleft
-                        elif event.key == pygame.K_RIGHT and self.maze[pos, pos + 1]:
-                            move = 'r'
-                            rect = self.rects[place + 2].topleft
-                        elif event.key == pygame.K_LEFT and self.maze[pos, pos - 1]:
-                            move = 'l'
-                            rect = self.rects[place - 2].topleft
 
-                        if move:
-                            self.fiancee.move(move, rect)
-                            move = None
+                            index = 0
+                            self.fiancee.update_image(index)
 
-                            if self.maze.won(*self.fiancee.xy):
+                            while self.fiancee.rect.topleft != rect:
+                                self.fiancee.rect.top -= 1
+
+                                index = index + 1 if index != 2 else 0
+                                self.fiancee.update_image(index)
+
                                 self.display_grid()
                                 self.screen.blit(self.fiancee.image, self.fiancee.rect)
+                                pygame.display.flip()
+                        elif event.key == pygame.K_DOWN and self.maze[pos, pos + shape]:
+                            self.fiancee.move('d')
 
-                                self.screen.blit(self.button_win, self.button_win_rect)
+                            rect = self.rects[place + 2*n_elem].topleft
+
+                            index = 6
+                            self.fiancee.update_image(index)
+
+                            while self.fiancee.rect.topleft != rect:
+                                self.fiancee.rect.top += 1
+
+                                index = index + 1 if index != 8 else 6
+                                self.fiancee.update_image(index)
+
+                                self.display_grid()
+                                self.screen.blit(self.fiancee.image, self.fiancee.rect)
+                                pygame.display.flip()
+                        elif event.key == pygame.K_RIGHT and self.maze[pos, pos + 1]:
+                            self.fiancee.move('r')
+
+                            rect = self.rects[place + 2].topleft
+
+                            index = 3
+                            self.fiancee.update_image(index)
+
+                            while self.fiancee.rect.topleft != rect:
+                                self.fiancee.rect.left += 1
+
+                                index = index + 1 if index != 5 else 3
+                                self.fiancee.update_image(index)
+
+                                self.display_grid()
+                                self.screen.blit(self.fiancee.image, self.fiancee.rect)
+                                pygame.display.flip()
+                        elif event.key == pygame.K_LEFT and self.maze[pos, pos - 1]:
+                            self.fiancee.move('l')
+
+                            rect = self.rects[place - 2].topleft
+
+                            index = 9
+                            self.fiancee.update_image(index)
+
+                            while self.fiancee.rect.topleft != rect:
+                                self.fiancee.rect.left += 1
+
+                                index = index + 1 if index != 11 else 9
+                                self.fiancee.update_image(index)
+
+                                self.display_grid()
+                                self.screen.blit(self.fiancee.image, self.fiancee.rect)
+                                pygame.display.flip()
+
+                        if self.maze.won(*self.fiancee.xy):
+                            self.display_grid()
+                            self.screen.blit(self.fiancee.image, self.fiancee.rect)
+
+                            self.screen.blit(self.button_win, self.button_win_rect)
 
             if not self.maze.won(*self.fiancee.xy):
                 self.display_grid()

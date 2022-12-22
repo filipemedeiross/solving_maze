@@ -29,19 +29,19 @@ class Fiancee:
 
         self.rect.topleft = place
 
-    def move(self, move, place):
+    def move(self, move):
         if (move == 'u'):
             self.__y -= 1
-            self.rect.topleft = place
         elif (move == 'd'):
             self.__y += 1
-            self.rect.topleft = place
         elif (move == 'r'):
             self.__x += 1
-            self.rect.topleft = place
         elif (move == 'l'):
             self.__x -= 1
-            self.rect.topleft = place       
+
+    def update_image(self, index):
+        self.index = index
+        self.image = self.images[self.index]
 
     @property
     def x(self):
