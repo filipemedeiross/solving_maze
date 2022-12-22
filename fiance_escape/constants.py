@@ -24,3 +24,9 @@ n_elem = 2*shape + 1
 block_side = maze_area / n_elem
 block_size = block_side, block_side
 button_size = 1.5*block_side, 1.5*block_side
+
+# Location of movements in sprites_sheets
+sprite_fiancee = {'u' : 0,
+                  'd' : 6,
+                  'r' : 3,
+                  'l' : 9}
