@@ -18,8 +18,9 @@ spacing_buttons = 20
 # Dimensions of screen elements
 font_size = 20
 
-maze_area = width - 2 * grid_left
-n_elem = 2 * shape + 1
-block_size = maze_area / n_elem
+maze_area = width - 2*grid_left
+n_elem = 2*shape + 1
 
-button_size = 1.5*block_size, 1.5*block_size
+block_side = maze_area / n_elem
+block_size = block_side, block_side
+button_size = 1.5*block_side, 1.5*block_side

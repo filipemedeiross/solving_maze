@@ -1,5 +1,7 @@
 # For detailed implementation see: tests/maze_generator.ipynb
+# This implementation has some changes
 import numpy as np
+
 
 class UnionFind:
     def __init__(self, n):
@@ -29,39 +31,37 @@ class UnionFind:
 class KruskalMazeGenerator:
     def __init__(self, N=100):
         self.N = N  # number os cells (default is a 10x10 grid)
+        self.shape = int(N**0.5)
         
         self.walls = self.generate_walls()
         
-    def new_maze(self):
-        maze = [[] for _ in range(self.N)]  # data structure to store the maze
-        
+    def new_maze(self):        
         # Copy the walls (edges) and create a set for each cell
         walls = self.walls.copy()
         forest = UnionFind(self.N)
         
         # Generate a maze (represented by an adjacency list)
+        maze = [[] for _ in range(self.N)]
         while forest.n > 1:
             v, w = walls.pop(np.random.randint(0, len(walls)))
             
             if forest.union(v, w):
-                maze[v].append(w)  # adding (v,w) in the maze
-                maze[w].append(v)  # adding (w,v) in the maze
+                maze[v].append(w)  # adding (v, w) in the maze
+                maze[w].append(v)  # adding (w, v) in the maze
                 
         return maze
                 
-    @staticmethod
-    def actions(N, v):
-        maze_shape = int(N**0.5)
-
+    def actions(self, v):  # takes into account the dimensions of the grid
         actions = []
-        if v % maze_shape != 0:
+
+        if v % self.shape != 0:
             actions.append((v, v-1))
-        if (v+1) % maze_shape != 0:
+        if (v+1) % self.shape != 0:
             actions.append((v, v+1))
-        if v >= maze_shape:
-            actions.append((v, v-maze_shape))
-        if v+maze_shape < N:
-            actions.append((v, v+maze_shape))
+        if v >= self.shape:
+            actions.append((v, v-self.shape))
+        if v+self.shape < self.N:
+            actions.append((v, v+self.shape))
 
         return actions  # possible actions in cell v
 
@@ -70,6 +70,6 @@ class KruskalMazeGenerator:
         
         # Movement represents the existence or not of a wall
         for v in range(self.N):
-            walls.extend(self.actions(self.N, v))
+            walls.extend(self.actions(v))
 
         return walls
