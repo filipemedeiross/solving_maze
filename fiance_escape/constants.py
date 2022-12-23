@@ -5,7 +5,7 @@ N = 100
 shape = int(N**0.5)
 
 # Colors
-COLOR_FONT = 0, 0, 0
+COLOR_FONT = 0, 100, 0
 
 # Dimensions
 size = width, height = 480, 600
@@ -22,11 +22,9 @@ maze_area = width - 2*grid_left
 n_elem = 2*shape + 1
 
 block_side = maze_area / n_elem
+button_side = 1.5*block_side
 block_size = block_side, block_side
-button_size = 1.5*block_side, 1.5*block_side
+button_size = button_side, button_side
 
 # Location of movements in sprites_sheets
-sprite_fiancee = {'u' : 0,
-                  'd' : 6,
-                  'r' : 3,
-                  'l' : 9}
+sprite_fiancee = {'u' : 0, 'd' : 6, 'r' : 3, 'l' : 9}

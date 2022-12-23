@@ -60,9 +60,11 @@ class FianceEscape:
         self.button_return = pygame.transform.scale(pygame.image.load('fiance_escape/media/main.png'), button_size)
         self.button_return_rect = self.button_return.get_rect(bottomleft=(grid_left, grid_top - 0.5*spacing_buttons))
 
-        self.button_win = pygame.transform.scale(pygame.image.load('fiance_escape/media/win.png'), (maze_area, maze_area))
-        self.button_win.set_alpha(280)
-        self.button_win_rect = self.button_win.get_rect(topleft=self.rects[0].topleft)
+        self.button_time = pygame.transform.scale(pygame.image.load('fiance_escape/media/time.png'), (2*button_side, button_side))
+        self.button_time_rect = self.button_time.get_rect(midtop=(width / 2, self.rects[-1].bottom + spacing_buttons))
+
+        self.button_win = pygame.transform.scale(pygame.image.load('fiance_escape/media/win.png'), (maze_area - 2*grid_left, maze_area // 5))
+        self.button_win_rect = self.button_win.get_rect(topleft=(2*grid_left, grid_top + maze_area // 5 * 2))
 
     def init_game(self):  # method that start the game
         # Creating a display Surface
@@ -122,8 +124,8 @@ class FianceEscape:
 
                 if not self.maze.won(self.fiancee.x, self.fiancee.y):
                     if event.type == pygame.KEYDOWN:
-                        pos = self.fiancee.x + self.fiancee.y*shape
-                        place = self.grid_to_place(self.fiancee.x, self.fiancee.y)
+                        pos = self.fiancee.x + self.fiancee.y*shape  # represents the vertex
+                        place = self.grid_to_place(self.fiancee.x, self.fiancee.y)  # represents the place on the grid
 
                         if event.key == pygame.K_UP and self.maze[pos, pos-shape]:
                             self.fiancee.move('u')
@@ -143,6 +145,7 @@ class FianceEscape:
             else:
                 # Game time
                 time += self.clock.tick(10)
+                self.display_time(time)
 
             pygame.display.flip()
 
@@ -194,11 +197,11 @@ class FianceEscape:
                     self.screen.blit(self.wall, self.rects[i_pos + (j_pos + 1)*n_elem + 1])
 
     def move_fiancee(self, move, place):
-        rect = self.rect_dest[move](place)
+        topleft = self.rect_dest[move](place)
         index = sprite_fiancee[move]
         
         i = index
-        while self.fiancee.rect.topleft != rect:
+        while self.fiancee.rect.topleft != topleft:
             self.fiancee.rect.topleft = self.movements[move](self.fiancee.rect)
 
             i += 1
@@ -208,6 +211,15 @@ class FianceEscape:
             self.screen.blit(self.fiancee.image, self.fiancee.rect)
 
             pygame.display.flip()
+
+    def display_time(self, time):
+        time_text = self.font.render(f'{time // 1000 // 60}:{time // 1000 % 60}', True, COLOR_FONT)
+
+        left = self.button_time_rect.centerx - time_text.get_width() / 2
+        top = self.button_time_rect.centery - time_text.get_height() / 2
+
+        self.screen.blit(self.button_time, self.button_time_rect)
+        self.screen.blit(time_text, (left, top))
 
     def update(self):
         self.maze.update_maze()  # update the grid
