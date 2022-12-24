@@ -42,20 +42,20 @@ class FianceEscape:
                           'l' : lambda rect: (rect.left-2, rect.top)}
 
         # Loading images used in the game
-        self.bg = pygame.transform.scale(pygame.image.load('fiance_escape/media/bg.png'), size)
-
         tiles = pygame.image.load('fiance_escape/media/ground_tiles.png')
 
         self.path = pygame.transform.scale(tiles.subsurface((64, 0), (64, 64)), block_size)
         self.wall = pygame.transform.scale(tiles.subsurface((128, 64), (64, 64)), block_size)
         self.limit = pygame.transform.scale(tiles.subsurface((0, 64), (64, 64)), block_size)
+        self.unknown = pygame.transform.scale(tiles.subsurface((320, 0), (64, 64)), block_size)
+
+        self.bg = self.load_bg('fiance_escape/media/bg.png')
 
         self.button_play = pygame.transform.scale(pygame.image.load('fiance_escape/media/play.png'), button_size)
         self.button_play_rect = self.button_play.get_rect(midtop=(width / 2, self.rects[-1].bottom + spacing_buttons))
 
         self.button_info = pygame.transform.scale(pygame.image.load('fiance_escape/media/info.png'), button_size)
-        self.button_info_rect = self.button_info.get_rect(bottomright=(width - grid_left,
-                                                                       grid_top - 0.5*spacing_buttons))
+        self.button_info_rect = self.button_info.get_rect(bottomright=(width - grid_left, grid_top - 0.5*spacing_buttons))
 
         self.button_return = pygame.transform.scale(pygame.image.load('fiance_escape/media/main.png'), button_size)
         self.button_return_rect = self.button_return.get_rect(bottomleft=(grid_left, grid_top - 0.5*spacing_buttons))
@@ -83,7 +83,6 @@ class FianceEscape:
         self.screen.blit(self.bg, (0, 0))
 
         self.screen.blit(self.button_info, self.button_info_rect)
-        self.display_grid()
         self.screen.blit(self.button_play, self.button_play_rect)
 
         pygame.display.flip()  # displaying the screen
@@ -100,9 +99,11 @@ class FianceEscape:
                         open('https://github.com/filipemedeiross/', new=2)
 
     def play(self):
-        # Update the clock
-        time = 0
+        # Update the maze surface and the clock
+        self.load_maze()
+
         self.clock.tick()
+        time = 0
 
         # Displaying fixed screen elements
         self.screen.blit(self.bg, (0, 0))  # overriding home screen buttons
@@ -149,52 +150,62 @@ class FianceEscape:
 
             pygame.display.flip()
 
-    def display_grid(self):
-        # Clearing the area of the maze
-        self.screen.blit(self.bg, self.rects[0].topleft, area=(self.rects[0].topleft, (maze_area, maze_area)))
+    def load_bg(self, filename):
+        background = pygame.transform.scale(pygame.image.load(filename), size)
 
-        # Displaying fixed screen elements
+        background.blit(pygame.transform.scale(self.path.copy(), maze_shape), self.rects[0].topleft)
+
+        for rect in self.rects:
+            background.blit(self.unknown, rect.topleft)
+
+        return background
+
+    def load_maze(self):
+        # Maze background
+        self.maze_surface = pygame.transform.scale(self.path.copy(), size)
 
         # Grid limits (superior and inferior)
+        last_line = n_elem*(n_elem-1)
         for i in range(n_elem):
-            self.screen.blit(self.limit, self.rects[i])
-            self.screen.blit(self.limit, self.rects[i + n_elem*(n_elem-1)])
+            self.maze_surface.blit(self.limit, self.rects[i])
+            self.maze_surface.blit(self.limit, self.rects[i + last_line])
 
         # Grid limits (side)
         for j in range(1, n_elem-2):
-            self.screen.blit(self.limit, self.rects[j*n_elem])            
-            self.screen.blit(self.limit, self.rects[j*n_elem + n_elem-1])
+            self.maze_surface.blit(self.limit, self.rects[j*n_elem])            
+            self.maze_surface.blit(self.limit, self.rects[j*n_elem + n_elem - 1])
 
-        self.screen.blit(self.limit, self.rects[n_elem*(n_elem-2)])            
-        self.screen.blit(self.path, self.rects[n_elem*(n_elem-1) - 1])
+        self.maze_surface.blit(self.limit, self.rects[last_line - n_elem])            
+        self.maze_surface.blit(self.path, self.rects[last_line - 1])
 
         # Checking and displaying elements of the graph representing the maze
-        # Horizontal paths
         for j in range(shape):
-            for i in range(shape-1):
-                i_pos, j_pos = self.grid_to_rect(i, j)
-
-                self.screen.blit(self.path, self.rects[i_pos + j_pos*n_elem])
-
-                if (self.maze[i + j*shape, i + j*shape + 1]):
-                    self.screen.blit(self.path, self.rects[i_pos + j_pos*n_elem + 1])
-                else:
-                    self.screen.blit(self.wall, self.rects[i_pos + j_pos*n_elem + 1])
-            
-            self.screen.blit(self.path, self.rects[i_pos + j_pos*n_elem + 2])
-
-        # Vertical paths
-        for j in range(shape-1):
             for i in range(shape):
                 i_pos, j_pos = self.grid_to_rect(i, j)
 
-                if (self.maze[i + j*shape, i + (j + 1)*shape]):
-                    self.screen.blit(self.path, self.rects[i_pos + (j_pos + 1)*n_elem])
-                else:
-                    self.screen.blit(self.wall, self.rects[i_pos + (j_pos + 1)*n_elem])
+                self.maze_surface.blit(self.path, self.rects[j_pos*n_elem + i_pos])
 
                 if (i != shape-1):
-                    self.screen.blit(self.wall, self.rects[i_pos + (j_pos + 1)*n_elem + 1])
+                    if (self.maze[j*shape + i, j*shape + i + 1]):
+                        self.maze_surface.blit(self.path, self.rects[j_pos*n_elem + i_pos + 1])
+                    else:
+                        self.maze_surface.blit(self.wall, self.rects[j_pos*n_elem + i_pos + 1])
+
+                    if (j != shape-1):
+                        self.maze_surface.blit(self.wall, self.rects[(j_pos+1)*n_elem + i_pos + 1])
+
+                if (j != shape-1):
+                    if (self.maze[j*shape + i, (j+1)*shape + i]):
+                        self.maze_surface.blit(self.path, self.rects[(j_pos+1)*n_elem + i_pos])
+                    else:
+                        self.maze_surface.blit(self.wall, self.rects[(j_pos+1)*n_elem + i_pos])
+
+    def display_grid(self):
+        ref_pos = self.grid_to_place(self.fiancee.x, self.fiancee.y) - (n_elem + 1)
+
+        # Hiding the area of the maze and showing known part
+        self.screen.blit(self.bg, self.rects[0].topleft, (self.rects[0].topleft, maze_shape))
+        self.screen.blit(self.maze_surface, self.rects[ref_pos].topleft, (self.rects[ref_pos].topleft, view_size))
 
     def move_fiancee(self, move, place):
         topleft = self.rect_dest[move](place)
@@ -213,7 +224,8 @@ class FianceEscape:
             pygame.display.flip()
 
     def display_time(self, time):
-        time_text = self.font.render(f'{time // 1000 // 60}:{time // 1000 % 60}', True, COLOR_FONT)
+        time_text = self.font.render(f'{time // 1000 // 60}:{time // 1000 % 60}',
+                                     True, COLOR_FONT)
 
         left = self.button_time_rect.centerx - time_text.get_width() / 2
         top = self.button_time_rect.centery - time_text.get_height() / 2
