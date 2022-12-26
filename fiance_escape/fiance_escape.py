@@ -123,7 +123,9 @@ class FianceEscape:
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.button_return_rect.collidepoint(event.pos):
+                        self.music_seeking.stop()
                         self.update()  # update the grid and reset fiancee
+                        
                         return
 
                 if not self.maze.won(self.fiancee.x, self.fiancee.y):
@@ -208,11 +210,11 @@ class FianceEscape:
                         self.maze_surface.blit(self.wall, self.rects[(j_pos+1)*n_elem + i_pos])
 
     def display_grid(self):
-        ref_pos = self.grid_to_place(self.fiancee.x, self.fiancee.y) - (n_elem + 1)
+        ref_pos = self.fiancee.rect.left - block_side, self.fiancee.rect.top - block_side
 
         # Hiding the area of the maze and showing known part
         self.screen.blit(self.bg, self.rects[0].topleft, (self.rects[0].topleft, maze_shape))
-        self.screen.blit(self.maze_surface, self.rects[ref_pos].topleft, (self.rects[ref_pos].topleft, view_size))
+        self.screen.blit(self.maze_surface, ref_pos, (ref_pos, view_size))
 
     def move_fiancee(self, move, place):
         topleft = self.rect_dest[move](place)
