@@ -20,7 +20,8 @@ class FianceEscape:
         self.font = pygame.font.SysFont('tlwgtypo', size=font_size, bold=True)
 
         # Init the mixer
-        pygame.mixer.music.load('fiance_escape/media/jungle_groove.ogg')
+        self.music_seeking = pygame.mixer.Sound('fiance_escape/media/jungle_groove.ogg')
+        self.music_win = pygame.mixer.Sound('fiance_escape/media/win.ogg')
 
         # Object to save time to solve the maze
         self.clock = pygame.time.Clock()
@@ -71,10 +72,10 @@ class FianceEscape:
         self.screen = pygame.display.set_mode(size)
         pygame.display.set_caption("Fiance Escape")
 
-        # Game background music
-        pygame.mixer.music.play(-1)
-
         while True:
+            # Game background music
+            self.music_seeking.play(-1)
+
             self.main_screen()
             self.play()
 
@@ -91,6 +92,7 @@ class FianceEscape:
             # Getting input from user
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.quit()
                     exit(0)  # leaving the game
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.button_play_rect.collidepoint(event.pos):
@@ -116,6 +118,7 @@ class FianceEscape:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.quit()
                     exit(0)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -141,9 +144,13 @@ class FianceEscape:
                             self.fiancee.move('l')
                             self.move_fiancee('l', place)
 
-            if self.maze.won(self.fiancee.x, self.fiancee.y):
-                self.screen.blit(self.button_win, self.button_win_rect)
-            else:
+                        if self.maze.won(self.fiancee.x, self.fiancee.y):
+                            self.screen.blit(self.button_win, self.button_win_rect)
+
+                            self.music_seeking.stop()
+                            self.music_win.play()
+
+            if not self.maze.won(self.fiancee.x, self.fiancee.y):
                 # Game time
                 time += self.clock.tick(10)
                 self.display_time(time)
