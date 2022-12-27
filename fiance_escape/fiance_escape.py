@@ -23,8 +23,10 @@ class FianceEscape:
         self.music_seeking = pygame.mixer.Sound('fiance_escape/media/jungle_groove.ogg')
         self.music_win = pygame.mixer.Sound('fiance_escape/media/win.ogg')
 
-        pygame.mixer.set_reserved(1)
         self.channel_music = pygame.mixer.Channel(0)
+        self.channel_effects = pygame.mixer.Channel(1)
+
+        self.music_seeking.set_volume(0.5)
 
         # Object to save time to solve the maze
         self.clock = pygame.time.Clock()
@@ -78,7 +80,7 @@ class FianceEscape:
         while True:
             # Game background music
             if not self.channel_music.get_busy():
-                self.channel_music = self.music_seeking.play(-1)
+                self.channel_music.play(self.music_seeking, -1)
 
             self.main_screen()
             self.play()
@@ -152,7 +154,7 @@ class FianceEscape:
                             self.screen.blit(self.button_win, self.button_win_rect)
 
                             self.channel_music.stop()
-                            self.music_win.play()
+                            self.channel_effects.play(self.music_win)
 
             if not self.maze.won(self.fiancee.x, self.fiancee.y):
                 # Game time
