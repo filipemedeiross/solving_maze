@@ -23,6 +23,9 @@ class FianceEscape:
         self.music_seeking = pygame.mixer.Sound('fiance_escape/media/jungle_groove.ogg')
         self.music_win = pygame.mixer.Sound('fiance_escape/media/win.ogg')
 
+        pygame.mixer.set_reserved(1)
+        self.channel_music = pygame.mixer.Channel(0)
+
         # Object to save time to solve the maze
         self.clock = pygame.time.Clock()
 
@@ -74,7 +77,8 @@ class FianceEscape:
 
         while True:
             # Game background music
-            self.music_seeking.play(-1)
+            if not self.channel_music.get_busy():
+                self.channel_music = self.music_seeking.play(-1)
 
             self.main_screen()
             self.play()
@@ -123,9 +127,7 @@ class FianceEscape:
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.button_return_rect.collidepoint(event.pos):
-                        self.music_seeking.stop()
                         self.update()  # update the grid and reset fiancee
-                        
                         return
 
                 if not self.maze.won(self.fiancee.x, self.fiancee.y):
@@ -149,7 +151,7 @@ class FianceEscape:
                         if self.maze.won(self.fiancee.x, self.fiancee.y):
                             self.screen.blit(self.button_win, self.button_win_rect)
 
-                            self.music_seeking.stop()
+                            self.channel_music.stop()
                             self.music_win.play()
 
             if not self.maze.won(self.fiancee.x, self.fiancee.y):
