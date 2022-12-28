@@ -51,3 +51,7 @@ class Fiancee:
 
         self.reset_image()
         self.rect.topleft = self.init_topleft
+
+    @property
+    def xy(self):
+        return self.x, self.y

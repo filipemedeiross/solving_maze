@@ -2,6 +2,7 @@ import pygame
 from webbrowser import open
 from .maze import Maze
 from .fiancee import Fiancee
+from .solvers import OnlineDFSAgent
 from .constants import *
 
 
@@ -10,6 +11,7 @@ class FianceEscape:
         # Initializing game logic
         self.maze = Maze(N)
         self.fiancee = Fiancee((grid_left + block_side, grid_top + block_side))  # fiancee starting position is passed
+        self.solver = None  # instantiated throughout the game
 
         pygame.init()  # initializing pygame
 
@@ -66,6 +68,10 @@ class FianceEscape:
         self.button_return = pygame.transform.scale(pygame.image.load('fiance_escape/media/main.png'), button_size)
         self.button_return_rect = self.button_return.get_rect(bottomleft=(grid_left, grid_top - 0.5*spacing_buttons))
 
+        self.button_solve = pygame.transform.scale(pygame.image.load('fiance_escape/media/solve.png'), button_size)
+        self.button_solve_rect = self.button_solve.get_rect(bottomleft=(self.button_return_rect.right + 0.5*spacing_buttons,
+                                                                        self.button_return_rect.bottom))
+
         self.button_time = pygame.transform.scale(pygame.image.load('fiance_escape/media/time.png'), (2*button_side, button_side))
         self.button_time_rect = self.button_time.get_rect(midtop=(width / 2, self.rects[-1].bottom + spacing_buttons))
 
@@ -117,6 +123,7 @@ class FianceEscape:
         self.screen.blit(self.bg, (0, 0))  # overriding home screen buttons
 
         self.screen.blit(self.button_return, self.button_return_rect)
+        self.screen.blit(self.button_solve, self.button_solve_rect)
 
         self.display_grid()
         self.screen.blit(self.fiancee.image, self.fiancee.rect)
@@ -126,36 +133,48 @@ class FianceEscape:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit(0)
-
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.button_return_rect.collidepoint(event.pos):
                         self.update()  # update the grid and reset fiancee
                         return
 
                 if not self.maze.won(self.fiancee.x, self.fiancee.y):
-                    if event.type == pygame.KEYDOWN:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if self.button_solve_rect.collidepoint(event.pos):
+                            self.solver = OnlineDFSAgent()
+
+                    if self.solver:
+                        while not self.maze.won(self.fiancee.x, self.fiancee.y):
+                            place = self.grid_to_place(self.fiancee.x, self.fiancee.y)  # represents the place on the grid
+                            action = self.solver.step_online(self.maze, self.fiancee.xy)
+
+                            self.fiancee.move(action)
+                            self.move_fiancee(action, place)
+                    elif event.type == pygame.KEYDOWN:
                         pos = self.fiancee.x + self.fiancee.y*shape  # represents the vertex
                         place = self.grid_to_place(self.fiancee.x, self.fiancee.y)  # represents the place on the grid
 
+                        action = None
+
                         if event.key == pygame.K_UP and self.maze[pos, pos-shape]:
-                            self.fiancee.move('u')
-                            self.move_fiancee('u', place)
+                            action = 'u'
                         elif event.key == pygame.K_DOWN and self.maze[pos, pos+shape]:
-                            self.fiancee.move('d')
-                            self.move_fiancee('d', place)
+                            action = 'd'
                         elif event.key == pygame.K_RIGHT and self.maze[pos, pos + 1]:
-                            self.fiancee.move('r')
-                            self.move_fiancee('r', place)
+                            action = 'r'
                         elif event.key == pygame.K_LEFT and self.maze[pos, pos - 1]:
-                            self.fiancee.move('l')
-                            self.move_fiancee('l', place)
+                            action = 'l'
 
-                        if self.maze.won(self.fiancee.x, self.fiancee.y):
-                            self.screen.blit(self.button_win, self.button_win_rect)
+                        if action:
+                            self.fiancee.move(action)
+                            self.move_fiancee(action, place)
 
-                            self.channel_music.stop()
-                            self.channel_effects.play(self.music_win)
+                    if self.maze.won(self.fiancee.x, self.fiancee.y):
+                        self.screen.blit(self.button_win, self.button_win_rect)
 
+                        self.channel_music.stop()
+                        self.channel_effects.play(self.music_win)
+                    
             if not self.maze.won(self.fiancee.x, self.fiancee.y):
                 # Game time
                 time += self.clock.tick(10)
@@ -249,6 +268,7 @@ class FianceEscape:
     def update(self):
         self.maze.update_maze()  # update the grid
         self.fiancee.reset()  # reset the fiance
+        self.solver = None  # reset the solver
             
     @staticmethod
     def grid_to_rect(x, y):
