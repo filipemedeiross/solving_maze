@@ -45,13 +45,13 @@ class OnlineDFSAgent:
         
         actions = []
         
+        if maze[place, place - 1] and self.a != 'r':
+            actions.append('l')
         if maze[place, place - maze.shape] and self.a != 'd':
             actions.append('u')
         if maze[place, place + 1] and self.a != 'l':
             actions.append('r')
         if maze[place, place + maze.shape] and self.a != 'u':
             actions.append('d')
-        if maze[place, place - 1] and self.a != 'r':
-            actions.append('l')
 
         return actions

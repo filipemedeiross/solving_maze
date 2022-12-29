@@ -2,7 +2,7 @@ import pygame
 from webbrowser import open
 from .maze import Maze
 from .fiancee import Fiancee
-from .solvers import OnlineDFSAgent
+from .solvers import OnlineDFSAgent, LRTAStar
 from .constants import *
 
 
@@ -69,7 +69,12 @@ class FianceEscape:
         self.button_return_rect = self.button_return.get_rect(bottomleft=(grid_left, grid_top - 0.5*spacing_buttons))
 
         self.button_solve = pygame.transform.scale(pygame.image.load('fiance_escape/media/solve.png'), button_size)
+        self.button_solve.set_alpha(180)
         self.button_solve_rect = self.button_solve.get_rect(bottomleft=(self.button_return_rect.right + 0.5*spacing_buttons,
+                                                                        self.button_return_rect.bottom))
+
+        self.button_solve_2 = pygame.transform.scale(pygame.image.load('fiance_escape/media/solve.png'), button_size)
+        self.button_solve_2_rect = self.button_solve_2.get_rect(bottomleft=(self.button_solve_rect.right + 0.5*spacing_buttons,
                                                                         self.button_return_rect.bottom))
 
         self.button_time = pygame.transform.scale(pygame.image.load('fiance_escape/media/time.png'), (2*button_side, button_side))
@@ -124,6 +129,7 @@ class FianceEscape:
 
         self.screen.blit(self.button_return, self.button_return_rect)
         self.screen.blit(self.button_solve, self.button_solve_rect)
+        self.screen.blit(self.button_solve_2, self.button_solve_2_rect)
 
         self.display_grid()
         self.screen.blit(self.fiancee.image, self.fiancee.rect)
@@ -142,6 +148,8 @@ class FianceEscape:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if self.button_solve_rect.collidepoint(event.pos):
                             self.solver = OnlineDFSAgent()
+                        elif self.button_solve_2_rect.collidepoint(event.pos):
+                            self.solver = LRTAStar()
 
                     if self.solver:
                         while not self.maze.won(self.fiancee.x, self.fiancee.y):
