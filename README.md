@@ -2,7 +2,7 @@
 
 ## Implementing the "Fiance escape" 
 
-The maze was implemented using the numpy library for the game logic and the pygame library for the interface. The maze grid is generated automatically through a generator inspired by a randomized version of Kruskal's algorithm in which the resulting tree represents the maze (so it has a unique path from the source to the goal).
+The maze was implemented using the numpy library for the game logic and the pygame library for the interface. The maze grid is generated automatically through a generator inspired by a randomized version of Kruskal's algorithm in which the resulting tree represents the maze (so it has a unique path from the origin to the goal).
 
 The game has three screens explained below:
 
@@ -20,11 +20,11 @@ When you win the game, time is paused and interaction with the maze grid and rel
 
 ## Resolution Strategy Implemented in the Game
 
-Considering that the task environment is partially observable (fiancee perceives only the actions immediately following her position), the intelligent agent cannot assemble a complete action plan towards the objective and then carry it out. It is necessary to use online problem solving strategies, that is, strategies in which the intelligent agent elaborates partial plans while executing actions.
+Considering that the task environment is partially observable (fiancee perceives only the actions immediately following her position), the intelligent agent cannot assemble a complete action plan towards the goal and then carry it out. It is necessary to use online problem solving strategies, that is, strategies in which the intelligent agent elaborates partial plans while executing actions.
 
 The first solver implements an online version analogous to depth-first search with backtracking (backtracking is necessary because the agent is traversing the state space while performing the search and builds a map of the environment), while the second solver implements a scheme called learning real-time A* (LRTA*) in which a “current best estimate” of the cost to reaching the goal from each visited state is stored and this value is used to guide the search instead of randomization.
 
-For this relatively simple task, the first solver proved to be more effective since, considering the origin and objective positions, the execution order of the actions is the most efficient ('d', 'r', 'u' and 'l').
+For this relatively simple task, the first solver proved to be more effective since, considering the origin and goal positions, the execution order of the actions is the most efficient ('d', 'r', 'u' and 'l').
 
 ## `fiance_escape` Pack Organization
 ```
