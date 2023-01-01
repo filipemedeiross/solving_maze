@@ -33,7 +33,7 @@ fiance_escape/                      Top-level package
       constants.py
       maze.py
       fiancee.py
-      fiancee_escape.py             It brings together the functionalities of the modules to implement the fiance escape
+      fiance_escape.py              It brings together the functionalities of the modules to implement the fiance escape
       media/                        Folder with the .png and .ogg files used in the game
               ...
       generators/                   Can be extended with different maze generators
