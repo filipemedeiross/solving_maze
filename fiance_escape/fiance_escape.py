@@ -68,10 +68,14 @@ class FianceEscape:
         self.button_return = pygame.transform.scale(pygame.image.load('fiance_escape/media/main.png'), button_size)
         self.button_return_rect = self.button_return.get_rect(bottomleft=(grid_left, grid_top - 0.5*spacing_buttons))
 
+        self.button_update = pygame.transform.scale(pygame.image.load('fiance_escape/media/update.png'), button_size)
+        self.button_update_rect = self.button_update.get_rect(bottomleft=(self.button_return_rect.right + 0.5*spacing_buttons,
+                                                                          self.button_return_rect.bottom))
+
         self.button_solve = pygame.transform.scale(pygame.image.load('fiance_escape/media/solve.png'), button_size)
         self.button_solve.set_alpha(180)
-        self.button_solve_rect = self.button_solve.get_rect(bottomleft=(self.button_return_rect.right + 0.5*spacing_buttons,
-                                                                        self.button_return_rect.bottom))
+        self.button_solve_rect = self.button_solve.get_rect(bottomleft=(self.button_update_rect.right + 0.5*spacing_buttons,
+                                                                        self.button_update_rect.bottom))
 
         self.button_solve_2 = pygame.transform.scale(pygame.image.load('fiance_escape/media/solve.png'), button_size)
         self.button_solve_2_rect = self.button_solve_2.get_rect(bottomleft=(self.button_solve_rect.right + 0.5*spacing_buttons,
@@ -89,9 +93,7 @@ class FianceEscape:
         pygame.display.set_caption("Fiance Escape")
 
         while True:
-            # Game background music
-            if not self.channel_music.get_busy():
-                self.channel_music.play(self.music_seeking, -1)
+            self.update()
 
             self.main_screen()
             self.play()
@@ -118,9 +120,7 @@ class FianceEscape:
                         open('https://github.com/filipemedeiross/', new=2)
 
     def play(self):
-        # Update the maze surface and the clock
-        self.load_maze()
-
+        # Update the clock
         self.clock.tick()
         time = 0
 
@@ -128,6 +128,7 @@ class FianceEscape:
         self.screen.blit(self.bg, (0, 0))  # overriding home screen buttons
 
         self.screen.blit(self.button_return, self.button_return_rect)
+        self.screen.blit(self.button_update, self.button_update_rect)
         self.screen.blit(self.button_solve, self.button_solve_rect)
         self.screen.blit(self.button_solve_2, self.button_solve_2_rect)
 
@@ -141,14 +142,21 @@ class FianceEscape:
                     exit(0)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.button_return_rect.collidepoint(event.pos):
-                        self.update()  # update the grid and reset fiancee
                         return
+                    if self.button_update_rect.collidepoint(event.pos):
+                        self.update()  # update the game
+
+                        self.clock.tick()
+                        time = 0
+
+                        self.display_grid()
+                        self.screen.blit(self.fiancee.image, self.fiancee.rect)
 
                 if not self.maze.won(self.fiancee.x, self.fiancee.y):
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if self.button_solve_rect.collidepoint(event.pos):
                             self.solver = OnlineDFSAgent()
-                        elif self.button_solve_2_rect.collidepoint(event.pos):
+                        if self.button_solve_2_rect.collidepoint(event.pos):
                             self.solver = LRTAStar()
 
                     if self.solver:
@@ -277,6 +285,11 @@ class FianceEscape:
         self.maze.update_maze()  # update the grid
         self.fiancee.reset()  # reset the fiance
         self.solver = None  # reset the solver
+        self.load_maze()  # update the maze
+
+        # Game background music
+        if not self.channel_music.get_busy():
+            self.channel_music.play(self.music_seeking, -1)
             
     @staticmethod
     def grid_to_rect(x, y):
