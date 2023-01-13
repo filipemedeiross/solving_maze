@@ -12,7 +12,7 @@ The home screen displays a hidden grid (only allowing you to observe the dimensi
 
 ![Game Screen](https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/game_screen.jpeg?raw=true)
 
-When starting the game, it displays the time count while allowing the user to go through the maze. The buttons above allow the user to return to the initial screen or activate one of the solvers to win the game.
+When starting the game, it displays the time count while allowing the user to go through the maze. The buttons above allow the user to return to the initial screen, upgrade the maze to start another round or activate one of the solvers to win the game.
 
 ![Winner Screen](https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/winner_screen.jpeg?raw=true)
 
