@@ -1,6 +1,5 @@
-from fiance_escape import FianceEscape
+from maze import FianceeEscape
 
-# Testing the game
-game = FianceEscape()
 
+game = FianceeEscape()
 game.init_game()
