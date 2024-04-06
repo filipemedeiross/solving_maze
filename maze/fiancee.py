@@ -2,13 +2,14 @@ from pygame.image import load
 from pygame.transform import scale
 from .constants import FIANCEE_PATH, FIANCEE_I, FIANCEE_J, \
                        FIANCEE_W, FIANCEE_H, FIANCEE_INIT, \
-                       BLOCK_SIZE
+                       FIANCEE_SPRITE, BLOCK_SIZE
 
 
 class Fiancee:
     def __init__(self, topleft):
-        self.x = 0
-        self.y = 0
+        self.x   = 0
+        self.y   = 0
+        self.idx = 0
         self.topleft = topleft
 
         self.load_images()
@@ -25,17 +26,19 @@ class Fiancee:
 
                 self.images.append(scale(image, BLOCK_SIZE))
 
-    def update_image(self, index, topleft):
+    def update_image(self, index):
         self.index = index
         self.image = self.images[self.index]
-        self.rect  = self.image.get_rect(topleft=topleft)
 
     def reset_image(self):
-        self.update_image(FIANCEE_INIT, self.topleft)
+        self.update_image(FIANCEE_INIT)
+
+        self.rect = self.image.get_rect(topleft=self.topleft)
 
     def reset(self):
-        self.x = 0
-        self.y = 0
+        self.x   = 0
+        self.y   = 0
+        self.idx = 0
 
         self.reset_image()
 
@@ -48,6 +51,19 @@ class Fiancee:
             self.y -= 1
         elif move == 'd':
             self.y += 1
+
+    def update(self, move):
+        self.idx += 1
+        self.update_image(self.idx % 3 + FIANCEE_SPRITE[move])
+
+        if move == 'l':
+            self.rect.left -= 1
+        elif move == 'r':
+            self.rect.left += 1
+        elif move == 'u':
+            self.rect.top -= 1
+        elif move == 'd':
+            self.rect.top += 1
 
     @property
     def xy(self):
