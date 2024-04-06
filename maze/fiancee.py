@@ -7,9 +7,8 @@ from .constants import FIANCEE_PATH, FIANCEE_I, FIANCEE_J, \
 
 class Fiancee:
     def __init__(self, topleft):
-        self.x   = 0
-        self.y   = 0
-        self.idx = 0
+        self.x = 0
+        self.y = 0
         self.topleft = topleft
 
         self.load_images()
@@ -36,9 +35,8 @@ class Fiancee:
         self.rect = self.image.get_rect(topleft=self.topleft)
 
     def reset(self):
-        self.x   = 0
-        self.y   = 0
-        self.idx = 0
+        self.x = 0
+        self.y = 0
 
         self.reset_image()
 
@@ -53,8 +51,8 @@ class Fiancee:
             self.y += 1
 
     def update(self, move):
-        self.idx += 1
-        self.update_image(self.idx % 3 + FIANCEE_SPRITE[move])
+        self.index += 1
+        self.update_image(self.index % 3 + FIANCEE_SPRITE[move])
 
         if move == 'l':
             self.rect.left -= 1
