@@ -13,7 +13,7 @@ class Maze:
                                  PrimMazeGenerator,
                                  KruskalMazeGenerator])(n)
 
-        self.update_maze()
+        self.reset()
 
     def __getitem__(self, move):
         pre, pos = move
@@ -23,7 +23,7 @@ class Maze:
 
         return False
 
-    def update_maze(self):
+    def reset(self):
         self.grid = self.generator.generate_maze()
 
     def won(self, x, y):
