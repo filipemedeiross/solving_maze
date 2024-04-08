@@ -14,11 +14,11 @@ INFO_PATH         = 'maze/media/info.png'
 MAIN_PATH         = 'maze/media/main.png'
 TIME_PATH         = 'maze/media/time.png'
 SOLVE_PATH        = 'maze/media/solve.png'
+TILES_PATH        = 'maze/media/tiles.png'
 UPDATE_PATH       = 'maze/media/update.png'
 FIANCEE_PATH      = 'maze/media/fiancee.png'
 WIN_MUSIC_PATH    = 'maze/media/win.ogg'
 GAME_MUSIC_PATH   = 'maze/media/jungle_groove.ogg'
-GROUND_TILES_PATH = 'maze/media/ground_tiles.png'
 
 # Dimensions of screen elements
 SIZE = WIDTH, HEIGHT = 480, 600
@@ -44,6 +44,7 @@ BUTTON_SIZE = BUTTON_SIDE, BUTTON_SIDE
 # Definitions of the game's classes and objects
 BUTTONS_BOT = GRID_TOP - SPC
 WIN_POS     = 2 * GRID_LEFT, GRID_TOP + MAZE_SIDE // 5 * 2
+MAZE_POS    = GRID_LEFT, GRID_TOP
 FIANCEE_POS = int(GRID_LEFT + SIDE), int(GRID_TOP + SIDE)
 
 FIANCEE_I = 3
