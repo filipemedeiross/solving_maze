@@ -1,4 +1,6 @@
 import pygame
+from pygame.image import load
+from pygame.transform import scale
 from webbrowser import open
 
 from .constants import *
@@ -15,7 +17,7 @@ class FianceeEscape:
         self.fiancee = Fiancee(FIANCEE_POS)
         self.solver  = None
 
-        self.rects = [pygame.Rect(GRID_LEFT + SIDE * j, GRID_TOP + SIDE * i, SIDE, SIDE)
+        self.rects = [pygame.Rect((GRID_LEFT + SIDE * j, GRID_TOP + SIDE * i), BLOCK_SIZE)
                       for i in range(ELEM)
                       for j in range(ELEM)]
 
@@ -36,7 +38,8 @@ class FianceeEscape:
         self.music_game.set_volume(0.6)
 
         # Loading images used in the game
-        self.load_bg(BG_PATH, GROUND_TILES_PATH)
+        self.load_tiles(TILES_PATH)
+        self.load_bg(BG_PATH)
 
         self.button_play = self.load_image(PLAY_PATH, BUTTON_SIZE)
         self.button_play_rect = self.button_play.get_rect(midtop=(WIDTH / 2, self.rects[-1].bottom + SPC))
@@ -90,7 +93,7 @@ class FianceeEscape:
         time = 0
 
         # Displaying fixed screen elements
-        self.screen.blit(self.background, (0, 0))  # overriding home screen buttons
+        self.screen.blit(self.bg, (0, 0))  # overriding home screen buttons
 
         self.screen.blit(self.button_return, self.button_return_rect)
         self.screen.blit(self.button_update, self.button_update_rect)
@@ -174,7 +177,7 @@ class FianceeEscape:
             self.channel_game.play(self.music_game, -1)
 
     def display_main_screen(self):
-        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.button_info, self.button_info_rect)
         self.screen.blit(self.button_play, self.button_play_rect)
 
@@ -184,7 +187,7 @@ class FianceeEscape:
         ref_pos = self.fiancee.rect.left - SIDE, self.fiancee.rect.top - SIDE
 
         # Hiding the area of the maze and showing known part
-        self.screen.blit(self.background, self.rects[0].topleft, (self.rects[0].topleft, MAZE_SIZE))
+        self.screen.blit(self.bg, self.rects[0].topleft, (self.rects[0].topleft, MAZE_SIZE))
         self.screen.blit(self.maze_surface, ref_pos, (ref_pos, VIEW_SIZE))
 
     def display_time(self, time):
@@ -207,26 +210,24 @@ class FianceeEscape:
 
             pygame.display.flip()
 
-    def load_bg(self, filename, tiles):
-        tiles = pygame.image.load(tiles)
+    def load_tiles(self, tiles_path):
+        tiles = self.load_image(tiles_path)
 
-        self.path = pygame.transform.scale(tiles.subsurface((64, 0), (64, 64)), BLOCK_SIZE)
-        self.wall = pygame.transform.scale(tiles.subsurface((128, 64), (64, 64)), BLOCK_SIZE)
-        self.limit = pygame.transform.scale(tiles.subsurface((0, 64), (64, 64)), BLOCK_SIZE)
-        self.unknown = pygame.transform.scale(tiles.subsurface((320, 0), (64, 64)), BLOCK_SIZE)
+        self.path    = scale(tiles.subsurface(( 64,  0), (64, 64)), BLOCK_SIZE)
+        self.wall    = scale(tiles.subsurface((128, 64), (64, 64)), BLOCK_SIZE)
+        self.limit   = scale(tiles.subsurface((  0, 64), (64, 64)), BLOCK_SIZE)
+        self.unknown = scale(tiles.subsurface((320,  0), (64, 64)), BLOCK_SIZE)
 
-        background = pygame.transform.scale(pygame.image.load(filename), SIZE)
+    def load_bg(self, bg_path):
+        self.bg = self.load_image(bg_path, SIZE)
 
-        background.blit(pygame.transform.scale(self.path.copy(), MAZE_SIZE), self.rects[0].topleft)
-
+        self.bg.blit(scale(self.path, MAZE_SIZE), MAZE_POS)
         for rect in self.rects:
-            background.blit(self.unknown, rect.topleft)
-
-        self.background = background
+            self.bg.blit(self.unknown, rect.topleft)
 
     def load_maze(self):
         # Maze background
-        self.maze_surface = pygame.transform.scale(self.path.copy(), SIZE)
+        self.maze_surface = scale(self.path.copy(), SIZE)
 
         # Grid limits (superior and inferior)
         last_line = ELEM*(ELEM-1)
@@ -274,5 +275,9 @@ class FianceeEscape:
         return 2 * x + 1, 2 * y + 1
 
     @staticmethod
-    def load_image(path, size):
-        return pygame.transform.scale(pygame.image.load(path), size)
+    def load_image(path, size=None):
+        img = load(path)
+        if size:
+            img = scale(img, size)
+
+        return img
