@@ -67,26 +67,17 @@ class FianceeEscape:
 
     def init_game(self):
         while True:
-            self.update()  # deve ser fora do loop
-
             self.main_screen()
             self.play()
 
     def main_screen(self):
-        # Preparing the main screen
-        self.screen.blit(self.background, (0, 0))
-
-        self.screen.blit(self.button_info, self.button_info_rect)
-        self.screen.blit(self.button_play, self.button_play_rect)
-
-        pygame.display.flip()  # displaying the screen
+        self.update()
+        self.display_main_screen()
 
         while True:
-            # Getting input from user
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit(0)  # leaving the game
+                    exit(0)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.button_play_rect.collidepoint(event.pos):
                         return
@@ -173,14 +164,21 @@ class FianceeEscape:
             pygame.display.flip()
 
     def update(self):
-        self.maze.update_maze()  # update the grid
-        self.fiancee.reset()  # reset the fiance
-        self.solver = None  # reset the solver
-        self.load_maze()  # update the maze
+        self.maze.reset()
+        self.fiancee.reset()
+        self.solver = None
 
-        # Game background music
+        self.load_maze()
+
         if not self.channel_game.get_busy():
             self.channel_game.play(self.music_game, -1)
+
+    def display_main_screen(self):
+        self.screen.blit(self.background, (0, 0))
+        self.screen.blit(self.button_info, self.button_info_rect)
+        self.screen.blit(self.button_play, self.button_play_rect)
+
+        pygame.display.flip()
 
     def display_grid(self):
         ref_pos = self.fiancee.rect.left - SIDE, self.fiancee.rect.top - SIDE
