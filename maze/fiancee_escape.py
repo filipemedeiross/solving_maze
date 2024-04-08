@@ -10,10 +10,14 @@ from .solvers import OnlineDFSAgent, \
 
 class FianceeEscape:
     def __init__(self):
-        # Initializing game logic
+        # Initializing game logic and defining the rects
         self.maze    = Maze(N)
         self.fiancee = Fiancee(FIANCEE_POS)
         self.solver  = None
+
+        self.rects = [pygame.Rect(GRID_LEFT + SIDE * j, GRID_TOP + SIDE * i, SIDE, SIDE)
+                      for i in range(ELEM)
+                      for j in range(ELEM)]
 
         # Instantiating the font, clock, screen and mixer
         pygame.init()
@@ -29,17 +33,7 @@ class FianceeEscape:
         self.channel_game = pygame.mixer.Channel(0)
         self.channel_win  = pygame.mixer.Channel(1)
 
-        self.music_game.set_volume(0.5)
-
-        # Defining the rects that will place the blocks on the screen
-        self.rects = [pygame.Rect(GRID_LEFT + SIDE * j, GRID_TOP + SIDE * i, SIDE, SIDE)
-                      for i in range(ELEM)
-                      for j in range(ELEM)]
-
-        self.dest = {'l' : lambda p: self.rects[p - 2].topleft,
-                     'r' : lambda p: self.rects[p + 2].topleft,
-                     'u' : lambda p: self.rects[p - 2*ELEM].topleft,
-                     'd' : lambda p: self.rects[p + 2*ELEM].topleft}
+        self.music_game.set_volume(0.6)
 
         # Loading images used in the game
         self.load_bg(BG_PATH, GROUND_TILES_PATH)
@@ -48,10 +42,10 @@ class FianceeEscape:
         self.button_play_rect = self.button_play.get_rect(midtop=(WIDTH / 2, self.rects[-1].bottom + SPC))
 
         self.button_info = self.load_image(INFO_PATH, BUTTON_SIZE)
-        self.button_info_rect = self.button_info.get_rect(bottomright=(WIDTH - GRID_LEFT, BUTTONS_TOP))
+        self.button_info_rect = self.button_info.get_rect(bottomright=(WIDTH - GRID_LEFT, BUTTONS_BOT))
 
         self.button_return = self.load_image(MAIN_PATH, BUTTON_SIZE)
-        self.button_return_rect = self.button_return.get_rect(bottomleft=(GRID_LEFT, BUTTONS_TOP))
+        self.button_return_rect = self.button_return.get_rect(bottomleft=(GRID_LEFT, BUTTONS_BOT))
 
         self.button_update = self.load_image(UPDATE_PATH, BUTTON_SIZE)
         self.button_update_rect = self.button_update.get_rect(topleft=(self.button_return_rect.right + SPC_BU,
@@ -59,11 +53,11 @@ class FianceeEscape:
 
         self.button_solve = self.load_image(SOLVE_PATH, BUTTON_SIZE)
         self.button_solve_rect = self.button_solve.get_rect(topleft=(self.button_update_rect.right + SPC_BU,
-                                                                        self.button_update_rect.top))
+                                                                     self.button_update_rect.top))
 
         self.button_solve_2 = self.load_image(SOLVE_PATH, BUTTON_SIZE)
         self.button_solve_2_rect = self.button_solve_2.get_rect(topleft=(self.button_solve_rect.right + SPC_BU,
-                                                                            self.button_solve_rect.top))
+                                                                         self.button_solve_rect.top))
 
         self.button_time = self.load_image(TIME_PATH, TIME_SIZE)
         self.button_time_rect = self.button_time.get_rect(center=self.button_play_rect.center)
@@ -73,7 +67,7 @@ class FianceeEscape:
 
     def init_game(self):
         while True:
-            self.update()
+            self.update()  # deve ser fora do loop
 
             self.main_screen()
             self.play()
@@ -178,6 +172,43 @@ class FianceeEscape:
 
             pygame.display.flip()
 
+    def update(self):
+        self.maze.update_maze()  # update the grid
+        self.fiancee.reset()  # reset the fiance
+        self.solver = None  # reset the solver
+        self.load_maze()  # update the maze
+
+        # Game background music
+        if not self.channel_game.get_busy():
+            self.channel_game.play(self.music_game, -1)
+
+    def display_grid(self):
+        ref_pos = self.fiancee.rect.left - SIDE, self.fiancee.rect.top - SIDE
+
+        # Hiding the area of the maze and showing known part
+        self.screen.blit(self.background, self.rects[0].topleft, (self.rects[0].topleft, MAZE_SIZE))
+        self.screen.blit(self.maze_surface, ref_pos, (ref_pos, VIEW_SIZE))
+
+    def display_time(self, time):
+        time_text = self.font.render(f'{time // 1000 // 60}:{time // 1000 % 60}',
+                                     True, FONT_COLOR)
+
+        left = self.button_time_rect.centerx - time_text.get_width() / 2
+        top = self.button_time_rect.centery - time_text.get_height() / 2
+
+        self.screen.blit(self.button_time, self.button_time_rect)
+        self.screen.blit(time_text, (left, top))
+
+    def move_fiancee(self, move, place):
+        topleft = DEST[move](self.rects, place)
+
+        while self.fiancee.rect.topleft != topleft:
+            self.fiancee.update(move)
+            self.display_grid()
+            self.screen.blit(self.fiancee.image, self.fiancee.rect)
+
+            pygame.display.flip()
+
     def load_bg(self, filename, tiles):
         tiles = pygame.image.load(tiles)
 
@@ -188,7 +219,7 @@ class FianceeEscape:
 
         background = pygame.transform.scale(pygame.image.load(filename), SIZE)
 
-        background.blit(pygame.transform.scale(self.path.copy(), maze_shape), self.rects[0].topleft)
+        background.blit(pygame.transform.scale(self.path.copy(), MAZE_SIZE), self.rects[0].topleft)
 
         for rect in self.rects:
             background.blit(self.unknown, rect.topleft)
@@ -235,51 +266,14 @@ class FianceeEscape:
                     else:
                         self.maze_surface.blit(self.wall, self.rects[(j_pos+1)*ELEM + i_pos])
 
-    def display_grid(self):
-        ref_pos = self.fiancee.rect.left - SIDE, self.fiancee.rect.top - SIDE
+    def grid_to_place(self, x, y):
+        x_, y_ = self.grid_to_rect(x, y)
 
-        # Hiding the area of the maze and showing known part
-        self.screen.blit(self.background, self.rects[0].topleft, (self.rects[0].topleft, maze_shape))
-        self.screen.blit(self.maze_surface, ref_pos, (ref_pos, view_size))
+        return x_ + ELEM * y_
 
-    def move_fiancee(self, move, place):
-        topleft = self.dest[move](place)
-
-        while self.fiancee.rect.topleft != topleft:
-            self.fiancee.update(move)
-            self.display_grid()
-            self.screen.blit(self.fiancee.image, self.fiancee.rect)
-
-            pygame.display.flip()
-
-    def display_time(self, time):
-        time_text = self.font.render(f'{time // 1000 // 60}:{time // 1000 % 60}',
-                                     True, FONT_COLOR)
-
-        left = self.button_time_rect.centerx - time_text.get_width() / 2
-        top = self.button_time_rect.centery - time_text.get_height() / 2
-
-        self.screen.blit(self.button_time, self.button_time_rect)
-        self.screen.blit(time_text, (left, top))
-
-    def update(self):
-        self.maze.update_maze()  # update the grid
-        self.fiancee.reset()  # reset the fiance
-        self.solver = None  # reset the solver
-        self.load_maze()  # update the maze
-
-        # Game background music
-        if not self.channel_game.get_busy():
-            self.channel_game.play(self.music_game, -1)
-            
     @staticmethod
     def grid_to_rect(x, y):
-        return (1 + 2*x, 1 + 2*y)  # transforms the (x, y) to the grid of rects
-
-    def grid_to_place(self, x, y):
-        x_pos, y_pos = self.grid_to_rect(x, y)
-
-        return x_pos + y_pos*ELEM
+        return 2 * x + 1, 2 * y + 1
 
     @staticmethod
     def load_image(path, size):
