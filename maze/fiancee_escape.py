@@ -188,7 +188,7 @@ class FianceeEscape:
 
         # Hiding the area of the maze and showing known part
         self.screen.blit(self.bg, self.rects[0].topleft, (self.rects[0].topleft, MAZE_SIZE))
-        self.screen.blit(self.maze_surface, ref_pos, (ref_pos, VIEW_SIZE))
+        self.screen.blit(self.maze_surf, ref_pos, (ref_pos, VIEW_SIZE))
 
     def display_time(self, time):
         time_text = self.font.render(f'{time // 1000 // 60}:{time // 1000 % 60}',
@@ -226,44 +226,47 @@ class FianceeEscape:
             self.bg.blit(self.unknown, rect.topleft)
 
     def load_maze(self):
-        # Maze background
-        self.maze_surface = scale(self.path.copy(), SIZE)
+        self.maze_surf = scale(self.path, SIZE)
 
-        # Grid limits (superior and inferior)
-        last_line = ELEM*(ELEM-1)
+        # Grid limits
+        last = ELEM * (ELEM - 1)
+
         for i in range(ELEM):
-            self.maze_surface.blit(self.limit, self.rects[i])
-            self.maze_surface.blit(self.limit, self.rects[i + last_line])
+            self.maze_surf.blit(self.limit, self.rects[i])
+            self.maze_surf.blit(self.limit, self.rects[i + last])
 
-        # Grid limits (side)
         for j in range(1, ELEM-2):
-            self.maze_surface.blit(self.limit, self.rects[j*ELEM])            
-            self.maze_surface.blit(self.limit, self.rects[j*ELEM + ELEM - 1])
+            self.maze_surf.blit(self.limit, self.rects[j * ELEM])
+            self.maze_surf.blit(self.limit, self.rects[(j + 1) * ELEM - 1])
 
-        self.maze_surface.blit(self.limit, self.rects[last_line - ELEM])            
-        self.maze_surface.blit(self.path, self.rects[last_line - 1])
+        self.maze_surf.blit(self.limit, self.rects[last - ELEM])
+        self.maze_surf.blit(self.path , self.rects[last - 1])
 
-        # Checking and displaying elements of the graph representing the maze
+        # Checking and displaying elements of the maze
         for j in range(SHAPE):
             for i in range(SHAPE):
-                i_pos, j_pos = self.grid_to_rect(i, j)
+                i_, j_ = self.grid_to_rect(i, j)
 
-                self.maze_surface.blit(self.path, self.rects[j_pos*ELEM + i_pos])
+                pos = i  + j  * SHAPE
+                plc = i_ + j_ * ELEM
 
-                if (i != SHAPE-1):
-                    if (self.maze[j*SHAPE + i, j*SHAPE + i + 1]):
-                        self.maze_surface.blit(self.path, self.rects[j_pos*ELEM + i_pos + 1])
-                    else:
-                        self.maze_surface.blit(self.wall, self.rects[j_pos*ELEM + i_pos + 1])
+                self.maze_surf.blit(self.path, self.rects[plc])
 
-                    if (j != SHAPE-1):
-                        self.maze_surface.blit(self.wall, self.rects[(j_pos+1)*ELEM + i_pos + 1])
+                if i != SHAPE-1:
+                    self.maze_surf.blit(self.path
+                                        if self.maze[pos, pos + 1]
+                                        else self.wall,
+                                        self.rects[plc + 1])
 
-                if (j != SHAPE-1):
-                    if (self.maze[j*SHAPE + i, (j+1)*SHAPE + i]):
-                        self.maze_surface.blit(self.path, self.rects[(j_pos+1)*ELEM + i_pos])
-                    else:
-                        self.maze_surface.blit(self.wall, self.rects[(j_pos+1)*ELEM + i_pos])
+                if j != SHAPE-1:
+                    self.maze_surf.blit(self.path
+                                        if self.maze[pos, pos + SHAPE]
+                                        else self.wall,
+                                        self.rects[plc + ELEM])
+
+                if i != SHAPE-1 and j != SHAPE-1:
+                    self.maze_surf.blit(self.wall,
+                                        self.rects[plc + ELEM + 1])
 
     def grid_to_place(self, x, y):
         x_, y_ = self.grid_to_rect(x, y)
