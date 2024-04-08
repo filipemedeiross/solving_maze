@@ -88,20 +88,11 @@ class FianceeEscape:
                         open('https://github.com/filipemedeiross/', new=2)
 
     def play(self):
+        self.display_play_screen()
+
         # Update the clock
         self.clock.tick()
         time = 0
-
-        # Displaying fixed screen elements
-        self.screen.blit(self.bg, (0, 0))  # overriding home screen buttons
-
-        self.screen.blit(self.button_return, self.button_return_rect)
-        self.screen.blit(self.button_update, self.button_update_rect)
-        self.screen.blit(self.button_solve, self.button_solve_rect)
-        self.screen.blit(self.button_solve_2, self.button_solve_2_rect)
-
-        self.display_grid()
-        self.screen.blit(self.fiancee.image, self.fiancee.rect)
 
         while True:
             for event in pygame.event.get():
@@ -178,17 +169,29 @@ class FianceeEscape:
 
     def display_main_screen(self):
         self.screen.blit(self.bg, (0, 0))
+
         self.screen.blit(self.button_info, self.button_info_rect)
         self.screen.blit(self.button_play, self.button_play_rect)
 
         pygame.display.flip()
 
+    def display_play_screen(self):
+        self.screen.blit(self.bg, (0, 0))
+
+        self.screen.blit(self.button_return, self.button_return_rect)
+        self.screen.blit(self.button_update, self.button_update_rect)
+        self.screen.blit(self.button_solve, self.button_solve_rect)
+        self.screen.blit(self.button_solve_2, self.button_solve_2_rect)
+
+        self.display_grid()
+
     def display_grid(self):
         ref_pos = self.fiancee.rect.left - SIDE, self.fiancee.rect.top - SIDE
 
-        # Hiding the area of the maze and showing known part
         self.screen.blit(self.bg, self.rects[0].topleft, (self.rects[0].topleft, MAZE_SIZE))
         self.screen.blit(self.maze_surf, ref_pos, (ref_pos, VIEW_SIZE))
+
+        self.screen.blit(self.fiancee.image, self.fiancee.rect)
 
     def display_time(self, time):
         time_text = self.font.render(f'{time // 1000 // 60}:{time // 1000 % 60}',
