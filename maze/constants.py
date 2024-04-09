@@ -1,7 +1,12 @@
+from pygame.locals import *
+
+
 # Settings
 N = 100
 SHAPE = int(N**0.5)
 ELEM  = 2 * SHAPE + 1
+
+FRAMERATE_PS = 10
 
 FONT_TYPE  = 'tlwgtypo'
 FONT_SIZE  = 20
