@@ -66,3 +66,15 @@ class Fiancee:
     @property
     def xy(self):
         return self.x, self.y
+
+    @property
+    def left(self):
+        return self.rect.left
+
+    @property
+    def top(self):
+        return self.rect.top
+
+    @property
+    def topleft(self):
+        return self.left, self.top
