@@ -9,7 +9,7 @@ class Fiancee:
     def __init__(self, topleft):
         self.x = 0
         self.y = 0
-        self.topleft = topleft
+        self.init_topleft = topleft
 
         self.load_images()
         self.reset_image()
@@ -32,7 +32,7 @@ class Fiancee:
     def reset_image(self):
         self.update_image(FIANCEE_INIT)
 
-        self.rect = self.image.get_rect(topleft=self.topleft)
+        self.rect = self.image.get_rect(topleft=self.init_topleft)
 
     def reset(self):
         self.x = 0
