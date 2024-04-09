@@ -63,7 +63,7 @@ In this relatively simple task, the first solver demonstrates greater effectiven
 Adopting the average number of steps required to win the game across 100 random instances of each maze generator as the efficiency metric for the algorithms. It was observed that, overall, in this relatively simple task environment, the online depth-first search algorithm yielded better results across all three maze generators, particularly excelling with the generator utilizing depth-first search due to similarities in their constructions.
 
 <p align="center">
-    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/comparison_search_methods.png?raw=true" width="600" height="400">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/comparison_search_methods.png?raw=true" width="500" height="400">
 </p>
 
 ## Maze Pack Organization
