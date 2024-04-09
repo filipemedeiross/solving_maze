@@ -76,7 +76,7 @@ maze/                               Top-level package
       constants.py
       maze.py
       fiancee.py
-      fiance_escape.py              It brings together the functionalities of the modules to implement the fiance escape
+      fiancee_escape.py             It brings together the functionalities of the modules to implement the fiance escape
       media/                        Folder with the .png and .ogg files used in the game
               ...
       generators/                   Collect maze generators
@@ -98,13 +98,13 @@ Using some Linux distro and make sure you have [Python 3](https://www.python.org
 Clone the project:
 
 ```bash
-  git clone https://github.com/filipemedeiross/solving_maze_by_online_search.git
+  git clone https://github.com/filipemedeiross/solving_maze.git
 ```
 
 Access the project directory:
 
 ```bash
-  cd solving_maze_by_online_search
+  cd solving_maze
 ```
 
 Creating a virtual environment (for the example we use the location directory parameter as `.venv`):
