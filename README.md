@@ -44,13 +44,15 @@ The randomized depth-first search algorithm explores the grid space randomly, pr
 Prim's algorithm is favored for its efficiency and simplicity in maze generation. It begins by selecting point 0 as the starting point and incrementally expands the maze by adding paths, randomly selecting available edges from the set of unexplored cells. This process continues until all cells are connected, creating a complete maze without cycles.
 
 ### Kruskal's Algorithm
-Kruskal's algorithm employs a disjoint set data structure to generate mazes (initially, each disjoint set has a single vertex, and the algorithm defines an auxiliary class with n representing the number of supernodes and v representing the parents). The maze generator inspired by a randomized version of Kruskal's algorithm represents the maze using an adjacency list, as the resulting graph is expected to be sparse. The resulting tree represents the maze, ensuring a unique path from the origin to the goal.
+Kruskal's algorithm employs a disjoint set data structure to generate mazes (initially, each disjoint set has a single vertex, and the algorithm defines an auxiliary class with n representing the number of supernodes and v representing the parents). The resulting tree represents the maze, ensuring a unique path from the origin to the goal.
 
 The behavior of the three distinct maze generation algorithms is depicted below:
 
 <p align="center">
     <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/maze_generator_methods.gif?raw=true" width="600" height="400">
 </p>
+
+> **Note**: The maze generators represents the maze using an adjacency list, as the resulting graph is expected to be sparse.
 
 ## Game Resolution Strategy
 
