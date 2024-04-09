@@ -1,34 +1,75 @@
-<h1>SOLVING MAZE BY ONLINE SEARCH</h1>
+<h1>SOLVING MAZE WITH ONLINE SEARCH ALGORITHMS</h1>
 
-## Implementing the "Fiance escape" 
+## Introduction
 
-The maze was implemented using the numpy library for the game logic and the pygame library for the interface. The maze grid is generated automatically through a generator inspired by a randomized version of Kruskal's algorithm in which the resulting tree represents the maze (so it has a unique path from the origin to the goal).
+This project is the third in a series of projects in which simple games will be developed using the pygame library, and these games will be conquered using machine learning algorithms and artificial intelligence in general.
 
-The game has three screens explained below:
+The motivation behind this approach lies in frequent situations where certain evaluation metrics, when applied to specific algorithms, prove to be inaccurate and obscure their true practical significance. In extreme cases, algorithms with poor performance may be inaccurately assessed positively by specific metrics that, in practice, do not reflect their true effectiveness and distort their evaluation.
 
-![Home Screen](https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/home_screen.jpeg?raw=true)
+When developing algorithms to win games, we have two main evaluation metrics that are simple and have empirical significance:
 
-The home screen displays a hidden grid (only allowing you to observe the dimensions of the maze) and the **Play** button that launches the game when clicked. It also has an **i** button that takes you to the creator's github profile.
+1. Whether the algorithm won or not.
+2. If it won, how efficient its performance was.
 
-![Game Screen](https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/game_screen.jpeg?raw=true)
+## Implementing the Maze
 
-When starting the game, it displays the time count while allowing the user to go through the maze. The buttons above allow the user to return to the initial screen, upgrade the maze to start another round or activate one of the solvers to win the game.
+The maze implementation utilizes the numpy library for game logic and the pygame library for the interface. The game features three distinct screens:
 
-![Winner Screen](https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/winner_screen.jpeg?raw=true)
+<p align="center">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/home_screen.jpeg?raw=true" width="250" height="400">
+</p>
 
-When you win the game, time is paused and interaction with the maze grid and related functions are disabled, leaving only the function to return to the initial screen.
+The home screen presents a concealed grid, revealing only the maze's dimensions, alongside the **Play** button, which launches the game upon clicking. Additionally, there's an **i** button that directs you to the creator's gitHub profile.
 
-## Resolution Strategy Implemented in the Game
+<p align="center">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/game_screen.jpeg?raw=true" width="250" height="400">
+</p>
 
-Considering that the task environment is partially observable (fiancee perceives only the actions immediately following her position), the intelligent agent cannot assemble a complete action plan towards the goal and then carry it out. It is necessary to use online problem solving strategies, that is, strategies in which the intelligent agent elaborates partial plans while executing actions.
+Upon starting the game, it showcases a timer while allowing users to navigate through the maze. The buttons above provide options to return to the initial screen, upgrade the maze for another round, or activate one of the solvers to triumph.
 
-The first solver implements an online version analogous to depth-first search with backtracking (backtracking is necessary because the agent is traversing the state space while performing the search and builds a map of the environment), while the second solver implements a scheme called learning real-time A* (LRTA*) in which a “current best estimate” of the cost to reaching the goal from each visited state is stored and this value is used to guide the search instead of randomization.
+<p align="center">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/winner_screen.jpeg?raw=true" width="250" height="400">
+</p>
 
-For this relatively simple task, the first solver proved to be more effective since, considering the origin and goal positions, the execution order of the actions is the most efficient ('d', 'r', 'u' and 'l').
+When you emerge victorious, the timer halts, and interaction with the maze grid and its related functions are disabled. The only available options are to return to the initial screen or update the grid for another round.
 
-## `fiance_escape` Pack Organization
+## A Dive into Maze Generation Algorithms
+
+The maze grid is automatically generated using three algorithms.
+
+### Depth-First Search
+The randomized depth-first search algorithm explores the grid space randomly, prioritizing unvisited cells at each step. Its recursive nature facilitates efficient backtracking when no unvisited cells are available, ensuring thorough exploration. By introducing randomness into the direction selection process, the algorithm generates unique and intricate mazes.
+
+### Prim's Algorithm
+Prim's algorithm is favored for its efficiency and simplicity in maze generation. It begins by selecting point 0 as the starting point and incrementally expands the maze by adding paths, randomly selecting available edges from the set of unexplored cells. This process continues until all cells are connected, creating a complete maze without cycles.
+
+### Kruskal's Algorithm
+Kruskal's algorithm employs a disjoint set data structure to generate mazes (initially, each disjoint set has a single vertex, and the algorithm defines an auxiliary class with n representing the number of supernodes and v representing the parents). The maze generator inspired by a randomized version of Kruskal's algorithm represents the maze using an adjacency list, as the resulting graph is expected to be sparse. The resulting tree represents the maze, ensuring a unique path from the origin to the goal.
+
+The behavior of the three distinct maze generation algorithms is depicted below:
+
+<p align="center">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/maze_generator_methods.gif?raw=true" width="600" height="400">
+</p>
+
+## Game Resolution Strategy
+
+Given the partially observable task environment, where the agent perceives only immediate actions, complete action planning towards the goal isn't feasible. Utilizing online problem-solving strategies becomes imperative, where the agent formulates partial plans while executing actions.
+
+The first solver implements an online version similar to depth-first search with backtracking, essential for traversing the state space and mapping the environment dynamically. Conversely, the second solver employs a learning real-time A* (LRTA*) approach, storing the "current best estimate" of reaching the goal from each visited state to guide the search instead of relying on randomization.
+
+In this relatively simple task, the first solver demonstrates greater effectiveness. Considering the origin and goal positions, the optimal action execution sequence ('d', 'r', 'u', and 'l') contributes to its efficiency.
+
+Adopting the average number of steps required to win the game across 100 random instances of each maze generator as the efficiency metric for the algorithms. It was observed that, overall, in this relatively simple task environment, the online depth-first search algorithm yielded better results across all three maze generators, particularly excelling with the generator utilizing depth-first search due to similarities in their constructions.
+
+<p align="center">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/comparison_search_methods.png?raw=true" width="600" height="400">
+</p>
+
+## Maze Pack Organization
+
 ```
-fiance_escape/                      Top-level package
+maze/                               Top-level package
       __init__.py
       constants.py
       maze.py
@@ -36,14 +77,18 @@ fiance_escape/                      Top-level package
       fiance_escape.py              It brings together the functionalities of the modules to implement the fiance escape
       media/                        Folder with the .png and .ogg files used in the game
               ...
-      generators/                   Can be extended with different maze generators
+      generators/                   Collect maze generators
               __init__.py
-              kruskal_generator.py  Implements the maze generator
+              dfs_generator.py
+              prim_generator.py
+              kruskal_generator.py
       solvers/                      Collect maze solvers        
               __init__.py
-              online_dfs.py         Solver using online depth search strategy
+              constants.py
+              odfs.py               Solver using online depth search strategy
               lrta.py               Solver using online search strategy with real-time learning A*
 ```
+
 ## Running the Game
 
 Using some Linux distro and make sure you have [Python 3](https://www.python.org/) installed.
@@ -86,10 +131,12 @@ Use the following command to run the game:
 
 ## References
 
-Norvig, Peter. Inteligência Artificial. Grupo GEN, 2013.
-
-Images and sounds used: <https://opengameart.org/>
+Stuart Russell and Peter Norvig. **Artificial Intelligence: A Modern Approach**. 3rd ed., Pearson, 2009.
 
 Numpy: <https://numpy.org/doc/stable/>
 
+NetworkX: <https://networkx.org/documentation/stable/index.html>
+
 Pygame: <https://www.pygame.org/docs/>
+
+Images used: <https://opengameart.org/>
