@@ -16,19 +16,19 @@ When developing algorithms to win games, we have two main evaluation metrics tha
 The maze implementation utilizes the numpy library for game logic and the pygame library for the interface. The game features three distinct screens:
 
 <p align="center">
-    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/home_screen.jpeg?raw=true" width="250" height="400">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/home_screen.png?raw=true" width="250" height="400">
 </p>
 
 The home screen presents a concealed grid, revealing only the maze's dimensions, alongside the **Play** button, which launches the game upon clicking. Additionally, there's an **i** button that directs you to the creator's gitHub profile.
 
 <p align="center">
-    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/game_screen.jpeg?raw=true" width="250" height="400">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/game_screen.png?raw=true" width="250" height="400">
 </p>
 
 Upon starting the game, it showcases a timer while allowing users to navigate through the maze. The buttons above provide options to return to the initial screen, upgrade the maze for another round, or activate one of the solvers to triumph.
 
 <p align="center">
-    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/winner_screen.jpeg?raw=true" width="250" height="400">
+    <img src="https://github.com/filipemedeiross/solving_maze_by_online_search/blob/main/examples/winner_screen.png?raw=true" width="250" height="400">
 </p>
 
 When you emerge victorious, the timer halts, and interaction with the maze grid and its related functions are disabled. The only available options are to return to the initial screen or update the grid for another round.
