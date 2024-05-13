@@ -141,4 +141,4 @@ NetworkX: <https://networkx.org/documentation/stable/index.html>
 
 Pygame: <https://www.pygame.org/docs/>
 
-Images used: <https://opengameart.org/>
+Images and sounds used: <https://opengameart.org/>
